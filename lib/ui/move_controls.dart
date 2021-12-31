@@ -15,7 +15,6 @@ class MoveControls extends PositionComponent with Tappable {
   Future<void>? onLoad() async {
     await super.onLoad();
     positionType = PositionType.viewport;
-    debugMode = true;
   }
 
   @override

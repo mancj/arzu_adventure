@@ -23,7 +23,7 @@ class ArzuSpriteStateGenerator extends SpriteStateGenerator<KingState> {
       'adventurer/idle.png',
       SpriteAnimationData.sequenced(
         amount: 4,
-        stepTime: .2,
+        stepTime: .15,
         textureSize: Vector2(50, 37),
       ),
     );

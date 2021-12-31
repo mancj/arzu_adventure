@@ -11,11 +11,18 @@ import 'package:the_arzo_flutter_flame/ui/move_controls.dart';
 class Enemy extends SpriteAnimationGroupComponent
     with HasGameRef<TheGame>, HasHitboxes, Collidable {
   var velocity = Vector2(0, 0);
-  var direction = MovementDirection.forward;
-  static const sf = 1.3;
+  static const double sf = 1;
   bool busy = false;
 
   double _health;
+  late Timer _idleAfterGestureTimer;
+  var _direction = MovementDirection.forward;
+
+  set direction(MovementDirection direction) {
+    _direction = direction;
+    final xsf = _direction == MovementDirection.forward ? -sf : sf;
+    scale = Vector2(xsf, sf);
+  }
 
   Enemy({
     required Vector2 position,
@@ -35,6 +42,15 @@ class Enemy extends SpriteAnimationGroupComponent
       ..scale = Vector2.all(sf)
       ..size = Vector2.all(48)
       ..anchor = Anchor.bottomCenter;
+
+    _idleAfterGestureTimer = Timer(
+      1,
+      autoStart: false,
+      repeat: false,
+      onTick: () {
+        current = EnemyState.idle;
+      },
+    );
   }
 
   @override
@@ -42,6 +58,7 @@ class Enemy extends SpriteAnimationGroupComponent
     super.onCollision(intersectionPoints, other);
     if (other is Arzu && !busy) {
       current = EnemyState.attack;
+      _lookAtComponent(other);
     }
   }
 
@@ -50,6 +67,8 @@ class Enemy extends SpriteAnimationGroupComponent
     super.onCollisionEnd(other);
     if (other is Arzu && !busy) {
       current = EnemyState.gesture;
+      _idleAfterGestureTimer.start();
+      _lookAtComponent(other);
     }
   }
 
@@ -57,6 +76,7 @@ class Enemy extends SpriteAnimationGroupComponent
   void update(double dt) {
     super.update(dt);
     position += velocity;
+    _idleAfterGestureTimer.update(dt);
   }
 
   @override
@@ -70,6 +90,14 @@ class Enemy extends SpriteAnimationGroupComponent
       ),
       Paint()..color = Colors.red,
     );
+  }
+
+  void _lookAtComponent(PositionComponent component) {
+    if (component.x < this.x) {
+      direction = MovementDirection.back;
+    } else {
+      direction = MovementDirection.forward;
+    }
   }
 
   void hurt() {

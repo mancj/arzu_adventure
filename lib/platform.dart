@@ -17,7 +17,7 @@ class GroundPlatform extends PositionComponent with HasGameRef<TheGame> {
     await super.onLoad();
 
     final img = await gameRef.images.load('tx_tileset_ground.png');
-    final ss = await SpriteSheet.fromColumnsAndRows(
+    final ss = SpriteSheet.fromColumnsAndRows(
       image: img,
       columns: 16,
       rows: 16,

@@ -1,60 +1,75 @@
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
-import 'package:flame_tiled/flame_tiled.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:logger/logger.dart';
 import 'package:the_arzo_flutter_flame/characters/arzu.dart';
 import 'package:the_arzo_flutter_flame/platform_map.dart';
 import 'package:the_arzo_flutter_flame/ui/attack_button.dart';
 import 'package:the_arzo_flutter_flame/ui/move_controls.dart';
+import 'package:the_arzo_flutter_flame/utils/vector2_extensions.dart';
 
-import 'characters/enemy.dart';
-
-final logger = Logger();
+final logger = Logger(printer: SimplePrinter());
 
 class TheGame extends FlameGame
     with HasTappables, KeyboardEvents, HasCollidables {
+  final _bgm = 'bgm.mp3';
   late Arzu _arzu;
+  bool soundsEnabled = false;
 
   @override
   Future<void>? onLoad() async {
     await super.onLoad();
 
-    final block = size.y / 10;
-
-    _arzu = Arzu(Vector2(100, size.y - (block * 3)));
-    add(_arzu);
-
-    add(AttackButton(onAttack: _arzu.attack));
-
-    for (var i = 0; i < 5; ++i) {
-      // final gp = GroundPlatform(position: Vector2(i * 280, y * 5), blocks: 12);
-      // add(gp);
-      add(Enemy(position: Vector2(i * 150,  size.y - (block * 3))));
+    if (soundsEnabled) {
+      await FlameAudio.bgm.load(_bgm);
+      FlameAudio.bgm.play(_bgm, volume: .5);
     }
 
-    add(
-      MoveControls(
-        size: Vector2(size.x / 2, size.y),
-        onMove: _arzu.move,
-        onStopMove: _arzu.idle,
-      ),
-    );
+    add(PositionComponent(size: Vector2(50, 50), position: Vector2(50, 50)));
 
-    add(PlatformMap(block));
+    final map = PlatformMap(position: Vector2(0, size.centerY));
+    await map.initialize();
+    add(map);
+
+    // final y = map.firstPlatformPosition.y;
+    final y = (map.size.y /  10) * 7;
+    print(y);
+
+    _arzu = Arzu(position: Vector2(50, map.position.y + y ));
+    add(_arzu);
+
+    add(MoveControls(
+      size: Vector2(size.x / 2, size.y),
+      onMove: _arzu.move,
+      onStopMove: _arzu.idle,
+    ));
+    add(AttackButton(onAttack: _arzu.attack));
+
+    // camera.zoom = 1.2;
   }
 
   @override
   void render(Canvas canvas) {
     super.render(canvas);
+    final paint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke;
     canvas.drawRect(
       Rect.fromLTRB(10, 10, size.x - 10, size.y - 10),
-      Paint()
-        ..color = Colors.white
-        ..style = PaintingStyle.stroke,
+      paint,
+    );
+    canvas.drawLine(
+      Offset(0, size.centerY),
+      Offset(size.x, size.centerY),
+      paint,
+    );
+    canvas.drawLine(
+      Offset(size.centerX, 0),
+      Offset(size.centerX, size.y),
+      paint,
     );
   }
 
@@ -79,5 +94,12 @@ class TheGame extends FlameGame
     }
 
     return super.onKeyEvent(event, keysPressed);
+  }
+
+  @override
+  void onRemove() {
+    FlameAudio.bgm.stop();
+    FlameAudio.bgm.clearAll();
+    super.onRemove();
   }
 }

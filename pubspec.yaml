@@ -35,6 +35,9 @@ dependencies:
   flame_tiled: ^1.0.0
   #utils
   logger: ^1.1.0
+  collection: ^1.15.0
+  #common
+  get_it: ^7.2.0
 
 dev_dependencies:
   flutter_test:
