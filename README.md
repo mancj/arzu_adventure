@@ -1,10 +1,10 @@
-# the_arzo_flutter_flame
-
-Arzu game project
+Arzu adventure game project
 
 ## Getting Started
 
 This project is a starting point for a Flutter application.
+
+🔥 This game created using [Flame](https://pub.dev/packages/flame) engine
 
 A few resources to get you started if this is your first Flutter project:
 
