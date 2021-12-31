@@ -1,5 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:flame/input.dart';
+import 'package:the_arzo_flutter_flame/models/movement_direction.dart';
 
 class MoveControls extends PositionComponent with Tappable {
   Function(MovementDirection direction)? onMove;
@@ -44,9 +45,4 @@ class MoveControls extends PositionComponent with Tappable {
     onStopMove?.call();
     return super.onTapCancel();
   }
-}
-
-enum MovementDirection {
-  forward,
-  back,
 }

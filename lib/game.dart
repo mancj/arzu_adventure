@@ -11,6 +11,8 @@ import 'package:the_arzo_flutter_flame/ui/attack_button.dart';
 import 'package:the_arzo_flutter_flame/ui/move_controls.dart';
 import 'package:the_arzo_flutter_flame/utils/vector2_extensions.dart';
 
+import 'models/movement_direction.dart';
+
 final logger = Logger(printer: SimplePrinter());
 
 class TheGame extends FlameGame

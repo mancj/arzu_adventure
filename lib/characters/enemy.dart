@@ -6,7 +6,7 @@ import 'package:flutter/rendering.dart';
 import 'package:the_arzo_flutter_flame/characters/arzu.dart';
 import 'package:the_arzo_flutter_flame/characters/state/enemy_sprite_state.generator.dart';
 import 'package:the_arzo_flutter_flame/game.dart';
-import 'package:the_arzo_flutter_flame/ui/move_controls.dart';
+import 'package:the_arzo_flutter_flame/models/movement_direction.dart';
 
 class Enemy extends SpriteAnimationGroupComponent
     with HasGameRef<TheGame>, HasHitboxes, Collidable {

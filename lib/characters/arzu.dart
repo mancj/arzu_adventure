@@ -6,10 +6,9 @@ import 'package:flame/geometry.dart';
 import 'package:flame/input.dart';
 import 'package:flame_audio/audio_pool.dart';
 import 'package:flame_audio/flame_audio.dart';
-import 'package:logger/logger.dart';
 import 'package:the_arzo_flutter_flame/characters/state/arzu_sprite_state_generator.dart';
 import 'package:the_arzo_flutter_flame/game.dart';
-import 'package:the_arzo_flutter_flame/ui/move_controls.dart';
+import 'package:the_arzo_flutter_flame/models/movement_direction.dart';
 
 import 'enemy.dart';
 
@@ -28,6 +27,8 @@ class Arzu extends SpriteAnimationGroupComponent
   ];
   static const double jumpVelocityY = -15;
   static const double scaleFactor = 1;
+  static const double movementVelocity = 20;
+  static const double jumpXVelocity = 4;
 
   Function? _pendingAction;
 
@@ -72,18 +73,6 @@ class Arzu extends SpriteAnimationGroupComponent
     }
   }
 
-  void onAttackComplete() {
-    busy = false;
-    if (_pendingAction != null) {
-      _pendingAction?.call();
-    } else if (velocity.x != 0) {
-      current = KingState.running;
-    } else {
-      current = KingState.idle;
-    }
-    _pendingAction = null;
-  }
-
   @override
   void update(double dt) {
     super.update(dt);
@@ -93,6 +82,21 @@ class Arzu extends SpriteAnimationGroupComponent
     } else {
       jumping = false;
       position.y = groundPos;
+    }
+  }
+
+  @override
+  void onCollision(Set<Vector2> intersectionPoints, Collidable other) {
+    if (other is Enemy) {
+      _collidedEnemy = other;
+    }
+  }
+
+  @override
+  void onCollisionEnd(Collidable other) {
+    super.onCollisionEnd(other);
+    if (other is Enemy) {
+      _collidedEnemy = null;
     }
   }
 
@@ -141,28 +145,27 @@ class Arzu extends SpriteAnimationGroupComponent
     _collidedEnemy?.hurt();
   }
 
+  void onAttackComplete() {
+    busy = false;
+    if (_pendingAction != null) {
+      _pendingAction?.call();
+    } else if (velocity.x != 0) {
+      current = KingState.running;
+    } else {
+      current = KingState.idle;
+    }
+    _pendingAction = null;
+  }
+
   void jump() {
     if (jumping) return;
     current = KingState.jump;
     jumping = true;
 
-    velocity = Vector2(velocity.x, jumpVelocityY);
+    final double xv =
+        velocity.x > 0 ? jumpXVelocity.byDirection(movementDirection) : 0;
+    velocity = Vector2(xv, jumpVelocityY);
     animation?.reset();
-  }
-
-  @override
-  void onCollision(Set<Vector2> intersectionPoints, Collidable other) {
-    if (other is Enemy) {
-      _collidedEnemy = other;
-    }
-  }
-
-  @override
-  void onCollisionEnd(Collidable other) {
-    super.onCollisionEnd(other);
-    if (other is Enemy) {
-      _collidedEnemy = null;
-    }
   }
 }
 
