@@ -3,7 +3,6 @@ import 'package:flame/extensions.dart';
 import 'package:flame/geometry.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:the_arzo_flutter_flame/characters/arzu.dart';
 import 'package:the_arzo_flutter_flame/characters/main_character_collision.dart';
 import 'package:the_arzo_flutter_flame/characters/state/enemy_sprite_state.generator.dart';
 import 'package:the_arzo_flutter_flame/game.dart';
@@ -84,19 +83,14 @@ class Enemy extends SpriteAnimationGroupComponent
   }
 
   final _fullHealthPaint = Paint()
-    ..color = Colors.red.withOpacity(.4);
+    ..color = Colors.pink.withOpacity(.4);
   final _healthPaint = Paint()
-    ..color = Colors.red;
+    ..color = Colors.pink;
 
   @override
   void render(Canvas canvas) {
     super.render(canvas);
     canvas.drawRect(
-      // Rect.fromLTRB(
-      //   center: Offset(size.x / 2, 10),
-      //   width: _fullHealth * 4,
-      //   height: 3,
-      // ),
       Rect.fromLTWH(size.centerX, 10, _fullHealth * 4, 3),
       _fullHealthPaint,
     );
@@ -107,7 +101,7 @@ class Enemy extends SpriteAnimationGroupComponent
   }
 
   void _lookAtComponent(PositionComponent component) {
-    if (component.x < this.x) {
+    if (component.absolutePosition.x < x) {
       direction = MovementDirection.back;
     } else {
       direction = MovementDirection.forward;

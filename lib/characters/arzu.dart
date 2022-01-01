@@ -30,13 +30,15 @@ class Arzu extends SpriteAnimationGroupComponent
     'sfx/Socapex - Swordsmall_3.mp3',
   ];
 
-  // static const double jumpXVelocityX = 7;
+  static const double jumpXVelocityX = 7;
   static const double jumpVelocityY = -30;
+  static const double movementVelocityX = 10;
   static const double scaleFactor = 1;
 
   Function? _pendingAction;
 
   MovementDirection movementDirection = MovementDirection.forward;
+  bool isMoving = false;
 
   int attachSfxIndex = 0;
   double groundPos = 0;
@@ -44,8 +46,8 @@ class Arzu extends SpriteAnimationGroupComponent
   int attackIndex = 0;
   var acceleration = Vector2(0, 1);
   var velocity = Vector2(0, 0);
-  bool busy = false;
-  bool jumping = false;
+  bool isBusy = false;
+  bool isJumping = false;
 
   late AudioPool pool;
   Enemy? _collidedEnemy;
@@ -79,16 +81,21 @@ class Arzu extends SpriteAnimationGroupComponent
             if (isCollided) {
               final possibleY = platform.absolutePosition.y + 10;
               if (absolutePosition.y <= possibleY) {
-                print('falling to false');
+                // player hits ground
                 falling = false;
                 groundPos = platform.absolutePosition.y;
-                print('hit on the ground');
+                if (velocity.x != 0) {
+                  // restore movement velocity after jump
+                  velocity.x = movementVelocityX.byDirection(movementDirection);
+                }
               } else {
-                jumping = false;
+                // player hits platform from bottom
+                isJumping = false;
                 falling = true;
                 idle();
               }
             } else {
+              // player is off-platform
               falling = true;
               logger.d('fall');
             }
@@ -109,26 +116,25 @@ class Arzu extends SpriteAnimationGroupComponent
     if (y < groundPos || falling) {
       velocity += acceleration;
     } else {
-      jumping = false;
+      isJumping = false;
       position.y = groundPos;
     }
   }
 
   void move(MovementDirection direction, {bool force = false}) {
-    if (busy || jumping || falling) return;
-    print('move');
+    if (isBusy || isJumping || falling) return;
+    isMoving = true;
     current = KingState.running;
     movementDirection = direction;
     final scaleX =
         direction == MovementDirection.forward ? scaleFactor : -scaleFactor;
     scale = Vector2(scaleX, scaleFactor);
-    const double v = 10;
-    final double x = direction == MovementDirection.forward ? v : -v;
+    final double x = movementVelocityX.byDirection(movementDirection);
     velocity = Vector2(x, 0);
   }
 
   void idle() {
-    if (busy || jumping) {
+    if (isBusy || isJumping) {
       logger.d('schedule pending action: idle');
       _pendingAction = idle;
       return;
@@ -136,10 +142,11 @@ class Arzu extends SpriteAnimationGroupComponent
     current = KingState.idle;
     velocity = Vector2.all(0);
     logger.d('Set idle state');
+    isMoving = false;
   }
 
   void attack() {
-    if (busy) return;
+    if (isBusy) return;
     logger.d('Attack');
     gameRef.camera.shake(intensity: 3);
     if (attachSfxIndex > attackSfxList.length - 1) {
@@ -150,7 +157,7 @@ class Arzu extends SpriteAnimationGroupComponent
     }
     attachSfxIndex++;
 
-    busy = true;
+    isBusy = true;
     current = attacks[attackIndex];
     attackIndex++;
     if (attackIndex > attacks.length - 1) {
@@ -161,10 +168,10 @@ class Arzu extends SpriteAnimationGroupComponent
   }
 
   void _onActionComplete() {
-    busy = false;
+    isBusy = false;
     if (_pendingAction != null) {
       _pendingAction?.call();
-    } else if (velocity.x != 0) {
+    } else if (isMoving) {
       current = KingState.running;
     } else {
       current = KingState.idle;
@@ -173,11 +180,12 @@ class Arzu extends SpriteAnimationGroupComponent
   }
 
   void jump() {
-    if (jumping) return;
+    if (isJumping) return;
     current = KingState.jump;
-    jumping = true;
+    isJumping = true;
 
-    final double xv = velocity.x != 0 ? velocity.x : 0;
+    final double xv =
+        velocity.x != 0 ? jumpXVelocityX.byDirection(movementDirection) : 0;
     velocity = Vector2(xv, jumpVelocityY);
     animation?.reset();
   }
