@@ -36,43 +36,31 @@ class TheGame extends FlameGame
     await map.initialize();
     add(map);
 
-    // final y = map.firstPlatformPosition.y;
-    final y = (map.size.y /  10) * 7;
-    print(y);
-
-    _arzu = Arzu(position: Vector2(50, map.position.y + y ));
+    final y = (map.size.y / 10) * 7;
+    _arzu = Arzu(position: Vector2(40, map.position.y + y));
     add(_arzu);
 
-    add(MoveControls(
-      size: Vector2(size.x / 2, size.y),
-      onMove: _arzu.move,
-      onStopMove: _arzu.idle,
-    ));
-    add(AttackButton(onAttack: _arzu.attack));
+    add(
+      MoveControls(
+        size: Vector2(size.x / 2, size.y),
+        onMove: _arzu.move,
+        onStopMove: _arzu.idle,
+      ),
+    );
+    add(
+      AttackButton(
+        position: Vector2(size.x - 24, size.y - 24),
+        onAttack: _arzu.attack,
+      ),
+    );
 
-    // camera.zoom = 1.2;
+    camera.zoom = 2;
   }
 
   @override
   void render(Canvas canvas) {
+    canvas.drawColor(Color(0xFF232C42), BlendMode.src);
     super.render(canvas);
-    final paint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.stroke;
-    canvas.drawRect(
-      Rect.fromLTRB(10, 10, size.x - 10, size.y - 10),
-      paint,
-    );
-    canvas.drawLine(
-      Offset(0, size.centerY),
-      Offset(size.x, size.centerY),
-      paint,
-    );
-    canvas.drawLine(
-      Offset(size.centerX, 0),
-      Offset(size.centerX, size.y),
-      paint,
-    );
   }
 
   @override

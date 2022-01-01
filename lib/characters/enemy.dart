@@ -4,9 +4,11 @@ import 'package:flame/geometry.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:the_arzo_flutter_flame/characters/arzu.dart';
+import 'package:the_arzo_flutter_flame/characters/main_character_collision.dart';
 import 'package:the_arzo_flutter_flame/characters/state/enemy_sprite_state.generator.dart';
 import 'package:the_arzo_flutter_flame/game.dart';
 import 'package:the_arzo_flutter_flame/models/movement_direction.dart';
+import 'package:the_arzo_flutter_flame/utils/vector2_extensions.dart';
 
 class Enemy extends SpriteAnimationGroupComponent
     with HasGameRef<TheGame>, HasHitboxes, Collidable {
@@ -15,6 +17,7 @@ class Enemy extends SpriteAnimationGroupComponent
   bool busy = false;
 
   double _health;
+  final double _fullHealth;
   late Timer _idleAfterGestureTimer;
   var _direction = MovementDirection.forward;
 
@@ -28,6 +31,7 @@ class Enemy extends SpriteAnimationGroupComponent
     required Vector2 position,
     health = 3.0,
   })  : _health = health,
+        _fullHealth = health,
         super(position: position);
 
   @override
@@ -56,7 +60,7 @@ class Enemy extends SpriteAnimationGroupComponent
   @override
   void onCollision(Set<Vector2> intersectionPoints, Collidable other) {
     super.onCollision(intersectionPoints, other);
-    if (other is Arzu && !busy) {
+    if (other is MainCharacterCollision && !busy) {
       current = EnemyState.attack;
       _lookAtComponent(other);
     }
@@ -65,7 +69,7 @@ class Enemy extends SpriteAnimationGroupComponent
   @override
   void onCollisionEnd(Collidable other) {
     super.onCollisionEnd(other);
-    if (other is Arzu && !busy) {
+    if (other is MainCharacterCollision && !busy) {
       current = EnemyState.gesture;
       _idleAfterGestureTimer.start();
       _lookAtComponent(other);
@@ -79,16 +83,26 @@ class Enemy extends SpriteAnimationGroupComponent
     _idleAfterGestureTimer.update(dt);
   }
 
+  final _fullHealthPaint = Paint()
+    ..color = Colors.red.withOpacity(.4);
+  final _healthPaint = Paint()
+    ..color = Colors.red;
+
   @override
   void render(Canvas canvas) {
     super.render(canvas);
     canvas.drawRect(
-      Rect.fromCenter(
-        center: Offset(size.x / 2, 10),
-        width: _health.toDouble() * 4,
-        height: 3,
-      ),
-      Paint()..color = Colors.red,
+      // Rect.fromLTRB(
+      //   center: Offset(size.x / 2, 10),
+      //   width: _fullHealth * 4,
+      //   height: 3,
+      // ),
+      Rect.fromLTWH(size.centerX, 10, _fullHealth * 4, 3),
+      _fullHealthPaint,
+    );
+    canvas.drawRect(
+      Rect.fromLTWH(size.centerX, 10, _health * 4, 3),
+      _healthPaint,
     );
   }
 
@@ -106,7 +120,6 @@ class Enemy extends SpriteAnimationGroupComponent
     _health--;
     if (_health <= 0) {
       current = EnemyState.die;
-      //   // remove(this);ddddddd
     }
   }
 }

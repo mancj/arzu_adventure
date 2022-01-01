@@ -2,24 +2,25 @@ import 'package:flame/components.dart';
 import 'package:flame/input.dart';
 import 'package:the_arzo_flutter_flame/game.dart';
 
-class AttackButton extends SpriteComponent
-    with HasGameRef<TheGame>, Tappable {
+class AttackButton extends SpriteComponent with HasGameRef<TheGame>, Tappable {
   Function()? onAttack;
 
-  AttackButton({this.onAttack});
+  AttackButton({
+    this.onAttack,
+    required Vector2 position,
+  }) : super(position: position);
 
   static const _size = 80.0;
 
   @override
   Future<void> onLoad() async {
+    await super.onLoad();
     positionType = PositionType.widget;
 
     final sprite = await gameRef.loadSprite('ui/attack_btn.png');
     this.sprite = sprite;
     size = Vector2(_size, _size);
-    position = Vector2(gameRef.size.x - 100, gameRef.size.y - 100);
-    anchor = Anchor.center;
-    return super.onLoad();
+    anchor = Anchor.bottomRight;
   }
 
   @override

@@ -56,12 +56,6 @@ class PlatformMap extends PositionComponent {
     enemies =
         _tiledComponent.tileMap.getObjectGroupFromLayer('enemies').objects;
   }
-
-  @override
-  void render(Canvas canvas) {
-    super.render(canvas);
-    canvas.drawCircle(Offset(0, size.y), 20, Paint()..color = Colors.white);
-  }
 }
 
 class Platform extends PositionComponent with HasHitboxes, Collidable {
