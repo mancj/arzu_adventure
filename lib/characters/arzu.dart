@@ -11,7 +11,7 @@ import 'package:the_arzo_flutter_flame/characters/main_character_collision.dart'
 import 'package:the_arzo_flutter_flame/characters/state/arzu_sprite_state_generator.dart';
 import 'package:the_arzo_flutter_flame/game.dart';
 import 'package:the_arzo_flutter_flame/models/movement_direction.dart';
-import 'package:the_arzo_flutter_flame/platform_map.dart';
+import 'package:the_arzo_flutter_flame/components/platform_map.dart';
 import 'package:the_arzo_flutter_flame/utils/vector2_extensions.dart';
 
 import 'enemy.dart';

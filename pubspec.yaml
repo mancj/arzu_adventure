@@ -65,6 +65,7 @@ flutter:
     - assets/images/enemy/
     - assets/images/ui/
     - assets/images/
+    - assets/images/items/
 
     - assets/audio/
     - assets/audio/sfx/

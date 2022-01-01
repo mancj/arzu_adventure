@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:the_arzo_flutter_flame/characters/main_character_collision.dart';
 import 'package:the_arzo_flutter_flame/characters/state/enemy_sprite_state.generator.dart';
+import 'package:the_arzo_flutter_flame/components/golden_coin.dart';
 import 'package:the_arzo_flutter_flame/game.dart';
 import 'package:the_arzo_flutter_flame/models/movement_direction.dart';
 import 'package:the_arzo_flutter_flame/utils/vector2_extensions.dart';
@@ -39,6 +40,7 @@ class Enemy extends SpriteAnimationGroupComponent
     final animations = await EnemySpriteStateGenerator(gameRef).create();
     addHitbox(HitboxRectangle());
 
+    animations[EnemyState.die]?.onComplete = addCoins;
     this
       ..animations = animations
       ..current = EnemyState.idle
@@ -54,6 +56,20 @@ class Enemy extends SpriteAnimationGroupComponent
         current = EnemyState.idle;
       },
     );
+  }
+
+  void addCoins() {
+    parent?.remove(this);
+    for (var i = 0; i < _fullHealth; ++i) {
+      parent?.add(
+        GoldenCoin(
+          position: Vector2(
+            position.x + (i * 16),
+            position.y,
+          ),
+        ),
+      );
+    }
   }
 
   @override
@@ -82,10 +98,8 @@ class Enemy extends SpriteAnimationGroupComponent
     _idleAfterGestureTimer.update(dt);
   }
 
-  final _fullHealthPaint = Paint()
-    ..color = Colors.pink.withOpacity(.4);
-  final _healthPaint = Paint()
-    ..color = Colors.pink;
+  final _fullHealthPaint = Paint()..color = Colors.pink.withOpacity(.4);
+  final _healthPaint = Paint()..color = Colors.pink;
 
   @override
   void render(Canvas canvas) {

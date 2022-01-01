@@ -1,15 +1,11 @@
-import 'dart:math';
-
-import 'package:collection/collection.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/geometry.dart';
 import 'package:flame_tiled/flame_tiled.dart';
-import 'package:flutter/material.dart';
 import 'package:the_arzo_flutter_flame/characters/enemy.dart';
 import 'package:tiled/tiled.dart';
 
-class PlatformMap extends PositionComponent {
+class PlatformMap extends PositionComponent with HasGameRef {
   final double tileSize = 32;
   static const double originalTileSize = 32;
 
@@ -37,7 +33,14 @@ class PlatformMap extends PositionComponent {
     }
 
     for (var enemy in enemies) {
-      add(Enemy(position: Vector2(enemy.x, enemy.y)));
+      gameRef.add(
+        Enemy(
+          position: Vector2(
+            absolutePosition.x + enemy.x,
+            absolutePosition.y + enemy.y,
+          ),
+        ),
+      );
     }
   }
 

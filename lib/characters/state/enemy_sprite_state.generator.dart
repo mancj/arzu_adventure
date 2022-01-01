@@ -51,7 +51,7 @@ class EnemySpriteStateGenerator extends SpriteStateGenerator<EnemyState> {
       'enemy/minotaur-die.png',
       SpriteAnimationData.sequenced(
         amount: 10,
-        stepTime: .07,
+        stepTime: .04,
         loop: false,
         textureSize: Vector2.all(48),
       ),

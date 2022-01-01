@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
 import 'package:the_arzo_flutter_flame/characters/arzu.dart';
-import 'package:the_arzo_flutter_flame/platform_map.dart';
+import 'package:the_arzo_flutter_flame/components/platform_map.dart';
 import 'package:the_arzo_flutter_flame/ui/attack_button.dart';
 import 'package:the_arzo_flutter_flame/ui/move_controls.dart';
 import 'package:the_arzo_flutter_flame/utils/vector2_extensions.dart';
@@ -19,7 +19,7 @@ class TheGame extends FlameGame
     with HasTappables, KeyboardEvents, HasCollidables {
   final _bgm = 'bgm.mp3';
   late Arzu _arzu;
-  bool soundsEnabled = false;
+  bool soundsEnabled = true;
 
   @override
   Future<void>? onLoad() async {
@@ -29,7 +29,6 @@ class TheGame extends FlameGame
       await FlameAudio.bgm.load(_bgm);
       FlameAudio.bgm.play(_bgm, volume: .5);
     }
-
     add(PositionComponent(size: Vector2(50, 50), position: Vector2(50, 50)));
 
     final map = PlatformMap(position: Vector2(0, size.centerY));
