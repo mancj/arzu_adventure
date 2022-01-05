@@ -19,7 +19,7 @@ class TheGame extends FlameGame
     with HasTappables, KeyboardEvents, HasCollidables {
   final _bgm = 'bgm.mp3';
   late Arzu _arzu;
-  bool soundsEnabled = true;
+  bool soundsEnabled = false;
 
   @override
   Future<void>? onLoad() async {
@@ -53,12 +53,12 @@ class TheGame extends FlameGame
       ),
     );
 
-    camera.zoom = 2;
+    camera.zoom = 1.7;
   }
 
   @override
   void render(Canvas canvas) {
-    canvas.drawColor(Color(0xFF232C42), BlendMode.src);
+    canvas.drawColor(const Color(0xFF232C42), BlendMode.src);
     super.render(canvas);
   }
 

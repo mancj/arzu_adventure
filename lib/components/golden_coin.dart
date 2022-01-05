@@ -13,7 +13,7 @@ class GoldenCoin extends PositionComponent with HasGameRef {
       'items/golden_coin.png',
       SpriteAnimationData.sequenced(
         amount: 6,
-        stepTime: .1,
+        stepTime: .07,
         textureSize: Vector2.all(16),
       ),
     );

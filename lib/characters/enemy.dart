@@ -2,7 +2,6 @@ import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/geometry.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:the_arzo_flutter_flame/characters/main_character_collision.dart';
 import 'package:the_arzo_flutter_flame/characters/state/enemy_sprite_state.generator.dart';
 import 'package:the_arzo_flutter_flame/components/golden_coin.dart';

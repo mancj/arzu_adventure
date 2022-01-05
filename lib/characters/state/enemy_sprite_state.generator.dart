@@ -6,6 +6,7 @@ import 'package:the_arzo_flutter_flame/characters/state/sprite_state_generator.d
 class EnemySpriteStateGenerator extends SpriteStateGenerator<EnemyState> {
   final Game gameRef;
   final Function()? onDie;
+  static const double stepTime = .07;
 
   const EnemySpriteStateGenerator(this.gameRef, {this.onDie});
 
@@ -15,7 +16,7 @@ class EnemySpriteStateGenerator extends SpriteStateGenerator<EnemyState> {
       'enemy/minotaur-idle.png',
       SpriteAnimationData.sequenced(
         amount: 10,
-        stepTime: .07,
+        stepTime: stepTime,
         textureSize: Vector2.all(48),
       ),
     );
@@ -24,7 +25,7 @@ class EnemySpriteStateGenerator extends SpriteStateGenerator<EnemyState> {
       'enemy/minotaur-walk.png',
       SpriteAnimationData.sequenced(
         amount: 10,
-        stepTime: .07,
+        stepTime: stepTime,
         textureSize: Vector2.all(48),
       ),
     );
@@ -33,7 +34,7 @@ class EnemySpriteStateGenerator extends SpriteStateGenerator<EnemyState> {
       'enemy/minotaur-attack.png',
       SpriteAnimationData.sequenced(
         amount: 10,
-        stepTime: .07,
+        stepTime: stepTime,
         textureSize: Vector2.all(48),
       ),
     );
@@ -42,7 +43,7 @@ class EnemySpriteStateGenerator extends SpriteStateGenerator<EnemyState> {
       'enemy/minotaur-gesture.png',
       SpriteAnimationData.sequenced(
         amount: 10,
-        stepTime: .07,
+        stepTime: stepTime,
         textureSize: Vector2.all(48),
       ),
     );
@@ -51,7 +52,7 @@ class EnemySpriteStateGenerator extends SpriteStateGenerator<EnemyState> {
       'enemy/minotaur-die.png',
       SpriteAnimationData.sequenced(
         amount: 10,
-        stepTime: .04,
+        stepTime: stepTime,
         loop: false,
         textureSize: Vector2.all(48),
       ),

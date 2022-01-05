@@ -46,15 +46,19 @@ class PlatformMap extends PositionComponent with HasGameRef {
 
   Future<void> initialize() async {
     _tiledComponent = await TiledComponent.load(
-      'test.tmx',
+      'lvl1_1.tmx',
       Vector2(tileSize, tileSize),
     );
     size = Vector2(
       _tiledComponent.tileMap.map.width * tileSize,
       _tiledComponent.tileMap.map.height * tileSize,
     );
+
+    final c = _tiledComponent.tileMap.map.layers
+        .firstWhere((element) => element.name == 'tiles');
+
     collisions =
-        _tiledComponent.tileMap.getObjectGroupFromLayer('collision').objects;
+        _tiledComponent.tileMap.getObjectGroupFromLayer('platforms').objects;
 
     enemies =
         _tiledComponent.tileMap.getObjectGroupFromLayer('enemies').objects;
