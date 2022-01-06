@@ -66,6 +66,7 @@ flutter:
     - assets/images/ui/
     - assets/images/
     - assets/images/items/
+    - assets/images/parallax/
 
     - assets/audio/
     - assets/audio/sfx/

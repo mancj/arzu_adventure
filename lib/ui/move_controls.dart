@@ -1,9 +1,10 @@
 import 'package:flame/components.dart';
 import 'package:flame/input.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:the_arzo_flutter_flame/models/movement_direction.dart';
 
 class MoveControls extends PositionComponent with Tappable {
-  Function(MovementDirection direction)? onMove;
+  Function(AxisDirection direction)? onMove;
   Function()? onStopMove;
 
   MoveControls({
@@ -20,14 +21,13 @@ class MoveControls extends PositionComponent with Tappable {
 
   @override
   bool onTapDown(TapDownInfo info) {
-    final MovementDirection direction;
+    final AxisDirection direction;
 
     final x = info.eventPosition.viewport.x;
-    print(x);
     if (x < size.x / 2) {
-      direction = MovementDirection.back;
+      direction = AxisDirection.left;
     } else {
-      direction = MovementDirection.forward;
+      direction = AxisDirection.right;
     }
 
     onMove?.call(direction);

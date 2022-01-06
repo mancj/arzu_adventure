@@ -1,6 +1,7 @@
 import 'package:flame/components.dart';
 import 'package:flame/geometry.dart';
 import 'package:the_arzo_flutter_flame/characters/enemy.dart';
+import 'package:the_arzo_flutter_flame/components/platform.dart';
 
 import '../components/platform_map.dart';
 

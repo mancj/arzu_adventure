@@ -1,29 +1,51 @@
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
+import 'package:flame/parallax.dart';
+import 'package:flame/parallax.dart';
+import 'package:flame/parallax.dart';
+import 'package:flame/parallax.dart';
+import 'package:flame/parallax.dart';
+import 'package:flame/parallax.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
-import 'package:the_arzo_flutter_flame/characters/arzu.dart';
+import 'package:the_arzo_flutter_flame/characters/player.dart';
 import 'package:the_arzo_flutter_flame/components/platform_map.dart';
 import 'package:the_arzo_flutter_flame/ui/attack_button.dart';
 import 'package:the_arzo_flutter_flame/ui/move_controls.dart';
 import 'package:the_arzo_flutter_flame/utils/vector2_extensions.dart';
-
-import 'models/movement_direction.dart';
 
 final logger = Logger(printer: SimplePrinter());
 
 class TheGame extends FlameGame
     with HasTappables, KeyboardEvents, HasCollidables {
   final _bgm = 'bgm.mp3';
-  late Arzu _arzu;
+  late Player _player;
   bool soundsEnabled = false;
+  late final ParallaxComponent parallax;
 
   @override
   Future<void>? onLoad() async {
     await super.onLoad();
+
+    final parallaxImages = [
+      ParallaxImageData('parallax/plx-1.png'),
+      ParallaxImageData('parallax/plx-2.png'),
+      ParallaxImageData('parallax/plx-3.png'),
+      ParallaxImageData('parallax/plx-4.png'),
+      ParallaxImageData('parallax/plx-5.png'),
+    ];
+
+    parallax = await loadParallaxComponent(
+      parallaxImages,
+      baseVelocity: Vector2(0, 0),
+      velocityMultiplierDelta: Vector2(2, 1),
+    )
+      ..position = Vector2(0, 0)
+      ..positionType = PositionType.viewport;
+    add(parallax);
 
     if (soundsEnabled) {
       await FlameAudio.bgm.load(_bgm);
@@ -35,21 +57,21 @@ class TheGame extends FlameGame
     await map.initialize();
     add(map);
 
-    final y = (map.size.y / 10) * 7;
-    _arzu = Arzu(position: Vector2(40, map.position.y + y));
-    add(_arzu);
+    final y = (map.size.y / 25) * 18;
+    _player = Player(position: Vector2(40, map.position.y + y));
+    add(_player);
 
     add(
       MoveControls(
         size: Vector2(size.x / 2, size.y),
-        onMove: _arzu.move,
-        onStopMove: _arzu.idle,
+        onMove: (direction) => _player.move(direction),
+        onStopMove: _player.stop,
       ),
     );
     add(
       AttackButton(
         position: Vector2(size.x - 24, size.y - 24),
-        onAttack: _arzu.attack,
+        onAttack: _player.attack,
       ),
     );
 
@@ -58,7 +80,6 @@ class TheGame extends FlameGame
 
   @override
   void render(Canvas canvas) {
-    canvas.drawColor(const Color(0xFF232C42), BlendMode.src);
     super.render(canvas);
   }
 
@@ -70,16 +91,16 @@ class TheGame extends FlameGame
 
     if (isKeyDown) {
       if (event.physicalKey == PhysicalKeyboardKey.keyD) {
-        _arzu.move(MovementDirection.forward);
+        _player.move(AxisDirection.right);
       } else if (event.physicalKey == PhysicalKeyboardKey.keyA) {
-        _arzu.move(MovementDirection.back);
+        _player.move(AxisDirection.left);
       } else if (event.logicalKey == LogicalKeyboardKey.space) {
-        _arzu.jump();
+        _player.jump();
       }
     } else if (isKeyUp &&
         (event.physicalKey == PhysicalKeyboardKey.keyD ||
             event.physicalKey == PhysicalKeyboardKey.keyA)) {
-      _arzu.idle();
+      _player.stop();
     }
 
     return super.onKeyEvent(event, keysPressed);

@@ -1,11 +1,11 @@
 import 'package:flame/game.dart';
 import 'package:flame/sprite.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:the_arzo_flutter_flame/characters/arzu.dart';
+import 'package:the_arzo_flutter_flame/characters/player.dart';
 import 'package:the_arzo_flutter_flame/characters/state/sprite_state_generator.dart';
 
 @immutable
-class ArzuSpriteStateGenerator extends SpriteStateGenerator<KingState> {
+class ArzuSpriteStateGenerator extends SpriteStateGenerator<PlayerState> {
   final Game gameRef;
 
   final Function() onAttackComplete;
@@ -18,7 +18,7 @@ class ArzuSpriteStateGenerator extends SpriteStateGenerator<KingState> {
   });
 
   @override
-  Future<Map<KingState, SpriteAnimation>> create() async {
+  Future<Map<PlayerState, SpriteAnimation>> create() async {
     final idle = await gameRef.loadSpriteAnimation(
       'adventurer/idle.png',
       SpriteAnimationData.sequenced(
@@ -85,12 +85,12 @@ class ArzuSpriteStateGenerator extends SpriteStateGenerator<KingState> {
       ..onComplete = onAttackComplete;
 
     return {
-      KingState.idle: idle,
-      KingState.running: run,
-      KingState.attack1: attack1,
-      KingState.attack2: attack2,
-      KingState.attack3: attack3,
-      KingState.jump: jump,
+      PlayerState.idle: idle,
+      PlayerState.running: run,
+      PlayerState.attack1: attack1,
+      PlayerState.attack2: attack2,
+      PlayerState.attack3: attack3,
+      PlayerState.jump: jump,
     };
   }
 }

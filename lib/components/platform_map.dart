@@ -3,6 +3,7 @@ import 'package:flame/extensions.dart';
 import 'package:flame/geometry.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:the_arzo_flutter_flame/characters/enemy.dart';
+import 'package:the_arzo_flutter_flame/components/platform.dart';
 import 'package:tiled/tiled.dart';
 
 class PlatformMap extends PositionComponent with HasGameRef {
@@ -26,8 +27,8 @@ class PlatformMap extends PositionComponent with HasGameRef {
     for (var collision in collisions) {
       add(
         Platform(
-          Vector2(collision.x, collision.y),
-          Vector2(collision.width, collision.height),
+          position: Vector2(collision.x, collision.y),
+          size: Vector2(collision.width, collision.height),
         ),
       );
     }
@@ -46,7 +47,7 @@ class PlatformMap extends PositionComponent with HasGameRef {
 
   Future<void> initialize() async {
     _tiledComponent = await TiledComponent.load(
-      'lvl1_1.tmx',
+      'lvl_1.tmx',
       Vector2(tileSize, tileSize),
     );
     size = Vector2(
@@ -62,21 +63,5 @@ class PlatformMap extends PositionComponent with HasGameRef {
 
     enemies =
         _tiledComponent.tileMap.getObjectGroupFromLayer('enemies').objects;
-  }
-}
-
-class Platform extends PositionComponent with HasHitboxes, Collidable {
-  Platform(
-    Vector2 position,
-    Vector2 size,
-  ) : super(
-          position: position,
-          size: size,
-        );
-
-  @override
-  Future<void>? onLoad() async {
-    await super.onLoad();
-    addHitbox(HitboxRectangle());
   }
 }

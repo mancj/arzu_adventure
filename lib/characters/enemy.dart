@@ -3,6 +3,7 @@ import 'package:flame/extensions.dart';
 import 'package:flame/geometry.dart';
 import 'package:flutter/material.dart';
 import 'package:the_arzo_flutter_flame/characters/main_character_collision.dart';
+import 'package:the_arzo_flutter_flame/characters/player_movement.dart';
 import 'package:the_arzo_flutter_flame/characters/state/enemy_sprite_state.generator.dart';
 import 'package:the_arzo_flutter_flame/components/golden_coin.dart';
 import 'package:the_arzo_flutter_flame/game.dart';
@@ -18,11 +19,11 @@ class Enemy extends SpriteAnimationGroupComponent
   double _health;
   final double _fullHealth;
   late Timer _idleAfterGestureTimer;
-  var _direction = MovementDirection.forward;
+  var _direction = AxisDirection.right;
 
-  set direction(MovementDirection direction) {
+  set direction(AxisDirection direction) {
     _direction = direction;
-    final xsf = _direction == MovementDirection.forward ? -sf : sf;
+    final xsf = _direction == AxisDirection.right ? -sf : sf;
     scale = Vector2(xsf, sf);
   }
 
@@ -74,7 +75,7 @@ class Enemy extends SpriteAnimationGroupComponent
   @override
   void onCollision(Set<Vector2> intersectionPoints, Collidable other) {
     super.onCollision(intersectionPoints, other);
-    if (other is MainCharacterCollision && !busy) {
+    if (other is PlayerMovement && !busy) {
       current = EnemyState.attack;
       _lookAtComponent(other);
     }
@@ -83,7 +84,7 @@ class Enemy extends SpriteAnimationGroupComponent
   @override
   void onCollisionEnd(Collidable other) {
     super.onCollisionEnd(other);
-    if (other is MainCharacterCollision && !busy) {
+    if (other is PlayerMovement && !busy) {
       current = EnemyState.gesture;
       _idleAfterGestureTimer.start();
       _lookAtComponent(other);
@@ -115,9 +116,9 @@ class Enemy extends SpriteAnimationGroupComponent
 
   void _lookAtComponent(PositionComponent component) {
     if (component.absolutePosition.x < x) {
-      direction = MovementDirection.back;
+      direction = AxisDirection.left;
     } else {
-      direction = MovementDirection.forward;
+      direction = AxisDirection.right;
     }
   }
 
