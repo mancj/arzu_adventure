@@ -2,20 +2,19 @@ import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flame/parallax.dart';
-import 'package:flame/parallax.dart';
-import 'package:flame/parallax.dart';
-import 'package:flame/parallax.dart';
-import 'package:flame/parallax.dart';
-import 'package:flame/parallax.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
 import 'package:the_arzo_flutter_flame/characters/player.dart';
-import 'package:the_arzo_flutter_flame/components/platform_map.dart';
+import 'package:the_arzo_flutter_flame/components/golden_coin.dart';
+import 'package:the_arzo_flutter_flame/components/parallax_background.dart';
 import 'package:the_arzo_flutter_flame/ui/attack_button.dart';
+import 'package:the_arzo_flutter_flame/ui/jump_button.dart';
 import 'package:the_arzo_flutter_flame/ui/move_controls.dart';
 import 'package:the_arzo_flutter_flame/utils/vector2_extensions.dart';
+
+import 'components/platform_map.dart';
 
 final logger = Logger(printer: SimplePrinter());
 
@@ -23,33 +22,22 @@ class TheGame extends FlameGame
     with HasTappables, KeyboardEvents, HasCollidables {
   final _bgm = 'bgm.mp3';
   late Player _player;
-  bool soundsEnabled = false;
+  bool soundsEnabled = true;
   late final ParallaxComponent parallax;
+
 
   @override
   Future<void>? onLoad() async {
     await super.onLoad();
 
-    final parallaxImages = [
-      ParallaxImageData('parallax/plx-1.png'),
-      ParallaxImageData('parallax/plx-2.png'),
-      ParallaxImageData('parallax/plx-3.png'),
-      ParallaxImageData('parallax/plx-4.png'),
-      ParallaxImageData('parallax/plx-5.png'),
-    ];
-
-    parallax = await loadParallaxComponent(
-      parallaxImages,
-      baseVelocity: Vector2(0, 0),
-      velocityMultiplierDelta: Vector2(2, 1),
-    )
-      ..position = Vector2(0, 0)
-      ..positionType = PositionType.viewport;
+    parallax = ParallaxBackground(size: size);
     add(parallax);
+
+    print('Game onLoad size: ${size}');
 
     if (soundsEnabled) {
       await FlameAudio.bgm.load(_bgm);
-      FlameAudio.bgm.play(_bgm, volume: .5);
+      // FlameAudio.bgm.play(_bgm, volume: .2);
     }
     add(PositionComponent(size: Vector2(50, 50), position: Vector2(50, 50)));
 
@@ -70,22 +58,36 @@ class TheGame extends FlameGame
     );
     add(
       AttackButton(
-        position: Vector2(size.x - 24, size.y - 24),
+        position: Vector2(size.x - 34, size.y - 34),
         onAttack: _player.attack,
       ),
     );
 
-    camera.zoom = 1.7;
+    final jumpButton = JumpButton(
+      position: Vector2(size.x - 164, size.y - 64),
+      onJump: _player.jump,
+    );
+    add(jumpButton);
+
+    camera.zoom = 1.6;
+
+    for (var i = 0; i < 50; ++i) {
+      add(GoldenCoin(
+        position:
+        Vector2(_player.position.x + (i * 30), _player.position.y + 10),
+      ));
+    }
   }
 
   @override
-  void render(Canvas canvas) {
-    super.render(canvas);
+  void onGameResize(Vector2 canvasSize) {
+    super.onGameResize(canvasSize);
+    print('Game resized ${canvasSize}');
   }
 
   @override
-  KeyEventResult onKeyEvent(
-      RawKeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
+  KeyEventResult onKeyEvent(RawKeyEvent event,
+      Set<LogicalKeyboardKey> keysPressed) {
     final isKeyDown = event is RawKeyDownEvent;
     final isKeyUp = event is RawKeyUpEvent;
 

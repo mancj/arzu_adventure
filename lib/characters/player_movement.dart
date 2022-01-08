@@ -17,6 +17,7 @@ class PlayerMovement extends SpriteAnimationGroupComponent
   double _landY = 0;
   bool isLanded = true;
   Platform? standingPlatform;
+  Platform? lastStandedPlatform;
   Platform? sidePlatform;
 
   bool _canMoveLeft = true;
@@ -28,7 +29,7 @@ class PlayerMovement extends SpriteAnimationGroupComponent
   /// by deceleration of moving x velocity
   late Timer _decelerationTimer;
 
-  static const double _jumpHeight = 100;
+  static const double _jumpHeight = 60;
   late Timer _jumpTimer;
   double _jumpDelta = 0;
 
@@ -56,7 +57,7 @@ class PlayerMovement extends SpriteAnimationGroupComponent
     _cameraPosition = Vector2(position.x, _landY);
     _camera.followVector2(
       _cameraPosition,
-      relativeOffset: const Anchor(.3, .6),
+      relativeOffset: const Anchor(.3, .5),
     );
 
     _createTimers();
@@ -65,7 +66,7 @@ class PlayerMovement extends SpriteAnimationGroupComponent
   void _createTimers() {
     _cameraYTimer = Timer(.5, autoStart: false);
     _jumpTimer = Timer(
-      .6,
+      .7,
       repeat: false,
       autoStart: false,
     );
@@ -90,7 +91,7 @@ class PlayerMovement extends SpriteAnimationGroupComponent
         position.x += _velocity.x * dt;
       }
     }
-    gameRef.parallax.parallax?.baseVelocity = Vector2(_velocity.x * dt / 5, 0);
+    // gameRef.parallax.parallax?.baseVelocity = Vector2(_velocity.x * dt / 5, 0);
     _cameraPosition.x = x;
 
     if (isLanded) {
@@ -109,15 +110,16 @@ class PlayerMovement extends SpriteAnimationGroupComponent
     _decelerationTimer.update(dt);
     if (_cameraYTimer.isRunning()) {
       _cameraYTimer.update(dt);
-      _cameraPosition.y =
-          _landY - (_cameraYDelta - (_cameraYDelta * _cameraYTimer.progress));
+      _cameraPosition.y = lastStandedPlatform!.absolutePosition.y -
+          (_cameraYDelta - (_cameraYDelta * _cameraYTimer.progress));
     }
-    // print(_cameraPosition.y);
   }
 
   void move(AxisDirection direction) {
-    _decelerationTimer.stop();
-    _decelerationTimer.reset();
+    if (_decelerationTimer.isRunning()) {
+      _decelerationTimer.stop();
+      _decelerationTimer.reset();
+    }
     if (direction == AxisDirection.left) {
       _velocity.x = -movementSpeed;
     } else if (direction == AxisDirection.right) {
@@ -129,11 +131,18 @@ class PlayerMovement extends SpriteAnimationGroupComponent
     _decelerationTimer.start();
   }
 
+  int jumpCount = 0;
+  int maxJumpCount = 2;
+
   void jump() {
-    if (!isLanded) return;
+    if (jumpCount >= maxJumpCount) {
+      return;
+    }
+    _landY = position.y;
     isLanded = false;
     _jumpTimer.reset();
     _jumpTimer.start();
+    jumpCount++;
   }
 
   void setFalling(bool isFalling) {
@@ -148,39 +157,41 @@ class PlayerMovement extends SpriteAnimationGroupComponent
       if (edge == PlatformEdge.top && other != sidePlatform) {
         isLanded = true;
         standingPlatform = other;
+        final oldPlatformY =
+            lastStandedPlatform?.absolutePosition.y ?? other.absolutePosition.y;
         _jumpTimer.stop();
         _jumpTimer.reset();
 
+        _cameraYDelta = other.absolutePosition.y - oldPlatformY;
         _cameraYTimer.stop();
         _cameraYTimer.start();
-        _camera.position.y = _landY;
-        _cameraYDelta = standingPlatform!.absolutePosition.y - _landY;
-        print(
-          'move camera to ${standingPlatform!.absolutePosition.y - _landY}',
-        );
+        _camera.position.y =
+            lastStandedPlatform?.absolutePosition.y ?? other.absolutePosition.y;
 
         _landY = standingPlatform!.absolutePosition.y;
+
+        print(
+          '\nlast standed platform: ${lastStandedPlatform?.absolutePosition}\n'
+          'new platform: ${other.absolutePosition}\n'
+          'camera\'s position: ${_camera.position.y}\n'
+          'camera y delta: ${_cameraYDelta}\n',
+        );
+
         position.y = _landY;
         setFalling(false);
+        lastStandedPlatform = standingPlatform;
+        jumpCount = 0;
       }
       if (edge == PlatformEdge.bottom) {
-        // sidePlatform = other;
         setFalling(standingPlatform == null);
         _jumpTimer.stop();
         _jumpTimer.reset();
       }
       if ((edge == PlatformEdge.left || edge == PlatformEdge.right)) {
-        print('side  collision');
         sidePlatform = other;
 
         _canMoveLeft = edge != PlatformEdge.right;
         _canMoveRight = edge != PlatformEdge.left;
-        //     true /*other.collisionEdge == null*/) {
-        //   print('collision side ${other.collisionEdge}');
-        //   _jumpTimer.stop();
-        //   _jumpTimer.reset();
-        //   isLanded = standingPlatform != null;
-        //   setFalling(standingPlatform == null);
       }
     }
   }
@@ -191,6 +202,7 @@ class PlayerMovement extends SpriteAnimationGroupComponent
     if (other is Platform && other == standingPlatform) {
       isLanded = false;
       standingPlatform = null;
+      lastStandedPlatform = other;
       setFalling(true);
     }
     if (other == sidePlatform) {

@@ -2,12 +2,10 @@ import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/geometry.dart';
 import 'package:flutter/material.dart';
-import 'package:the_arzo_flutter_flame/characters/main_character_collision.dart';
 import 'package:the_arzo_flutter_flame/characters/player_movement.dart';
 import 'package:the_arzo_flutter_flame/characters/state/enemy_sprite_state.generator.dart';
 import 'package:the_arzo_flutter_flame/components/golden_coin.dart';
 import 'package:the_arzo_flutter_flame/game.dart';
-import 'package:the_arzo_flutter_flame/models/movement_direction.dart';
 import 'package:the_arzo_flutter_flame/utils/vector2_extensions.dart';
 
 class Enemy extends SpriteAnimationGroupComponent
@@ -64,7 +62,7 @@ class Enemy extends SpriteAnimationGroupComponent
       parent?.add(
         GoldenCoin(
           position: Vector2(
-            position.x + (i * 16),
+            position.x + (i * 20),
             position.y,
           ),
         ),

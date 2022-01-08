@@ -2,8 +2,6 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/game.dart';
-import 'package:flame/geometry.dart';
-import 'package:flame/geometry.dart';
 import 'package:flame/input.dart';
 import 'package:flame_audio/audio_pool.dart';
 import 'package:flame_audio/flame_audio.dart';
@@ -22,7 +20,9 @@ class Player extends PlayerMovement with Tappable {
     PlayerState.attack3,
   ];
   static const attackSfxList = [
-    'sfx/Socapex - Swordsmall.mp3',
+    'sfx/attack.mp3',
+    'sfx/socapex_new_hits_2.wav',
+    'sfx/fall_ground.mp3',
     'sfx/Socapex - Swordsmall_1.mp3',
     'sfx/Socapex - Swordsmall_2.mp3',
     'sfx/Socapex - Swordsmall_3.mp3',
@@ -36,7 +36,6 @@ class Player extends PlayerMovement with Tappable {
   int attackIndex = 0;
   bool isBusy = false;
 
-
   late AudioPool pool;
   Enemy? _collidedEnemy;
 
@@ -45,6 +44,10 @@ class Player extends PlayerMovement with Tappable {
   @override
   Future<void>? onLoad() async {
     await super.onLoad();
+    if (gameRef.soundsEnabled) {
+      await FlameAudio.audioCache.load(attackSfxList[0]);
+    }
+
     final animations = await ArzuSpriteStateGenerator(
       gameRef: gameRef,
       onAttackComplete: _onActionComplete,
@@ -57,15 +60,12 @@ class Player extends PlayerMovement with Tappable {
       ..scale = Vector2.all(scaleFactor)
       ..size = Vector2(50, 37)
       ..anchor = Anchor.bottomCenter;
-
-    if (gameRef.soundsEnabled) {
-      await FlameAudio.audioCache.loadAll(attackSfxList);
-    }
   }
 
   @override
   void move(AxisDirection direction) {
     super.move(direction);
+    if (isBusy) return;
     current = PlayerState.running;
     final scaleX =
         direction == AxisDirection.right ? scaleFactor : -scaleFactor;
@@ -106,7 +106,7 @@ class Player extends PlayerMovement with Tappable {
       attachSfxIndex = 0;
     }
     if (gameRef.soundsEnabled) {
-      FlameAudio.audioCache.play(attackSfxList[attachSfxIndex]);
+      FlameAudio.audioCache.play(attackSfxList[0]);
     }
     attachSfxIndex++;
 
@@ -119,6 +119,9 @@ class Player extends PlayerMovement with Tappable {
     animation?.reset();
     _collidedEnemy?.hurt();
   }
+
+  @override
+  void onPlatformFall() {}
 
   void _onActionComplete() {
     isBusy = false;
